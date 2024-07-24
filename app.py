@@ -1,11 +1,23 @@
-import os
-import openai
 import streamlit as st
-from dotenv import load_dotenv
+import openai
+import base64
 
-load_dotenv()
+# Replace with your actual encoded API key
+encoded_api_key = "c2stcHJvai1OQktuTWx3Y0tKZmZOck5Zc0hpdVQzQmxia0ZKU3hvM1RiUWZhdjVGQ1Y4YVk1eWY="
 
-openai_api_key = os.getenv("OPENAI_API_KEY")
+# Ensure correct padding
+if len(encoded_api_key) % 4 != 0:
+    encoded_api_key += "=" * (4 - len(encoded_api_key) % 4)
+
+# Decode the API key
+try:
+    openai_api_key = base64.b64decode(encoded_api_key).decode("utf-8")
+except Exception as e:
+    print("Error decoding API key:", e)
+    raise
+
+# Set up OpenAI API key
+openai.api_key = openai_api_key
 
 # Set up sidebar with subject checkboxes
 with st.sidebar:
@@ -18,25 +30,23 @@ with st.sidebar:
             selected_subject = subject
             break
 
-st.title("💬 My Chatbot for 9th Grade ")
+st.title("💬 My Chatbot for 9th Grade")
 st.caption("🚀 A Streamlit chatbot powered by Me")
 
+# Initialize the session state to store messages
 if "messages" not in st.session_state:
     st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
 
+# Display chat messages from the session state
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg["content"])
 
+# Chat input and processing
 if prompt := st.chat_input():
-    if not openai_api_key:
-        st.info("Please add your OpenAI API key to continue.")
-        st.stop()
-
     if not selected_subject:
         st.info("Please select a subject to continue.")
         st.stop()
 
-    openai.api_key = openai_api_key
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
 
@@ -48,6 +58,6 @@ if prompt := st.chat_input():
         model="gpt-3.5-turbo",
         messages=[{"role": "system", "content": subject_prompt}] + st.session_state.messages
     )
-    msg = response.choices[0].message["content"]
+    msg = response.choices[0]["message"]["content"]
     st.session_state.messages.append({"role": "assistant", "content": msg})
     st.chat_message("assistant").write(msg)
