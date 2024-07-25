@@ -19,19 +19,23 @@ except Exception as e:
 # Set up OpenAI API key
 openai.api_key = openai_api_key
 
-# Set up sidebar with subject checkboxes
+# Set up sidebar with subject radio buttons
 with st.sidebar:
     st.header("Select a Subject")
-    subjects = ["Maths", "Physics", "Chemistry", "Biology", "English", "Urdu", "Pak Studies", "General Mathematics",
-                "Computer Science"]
-    selected_subject = None
-    for subject in subjects:
-        if st.checkbox(subject):
-            selected_subject = subject
-            break
+    subjects = ["Maths", "Physics", "Chemistry", "Biology", "English", "Urdu", "Pak Studies", "General Mathematics", "Computer Science"]
 
-st.title("Learn with Chatbot - 9th Grade Students")
-st.caption("Powered by ChatGpt")
+    if "selected_subject" not in st.session_state:
+        st.session_state.selected_subject = None
+
+    selected_subject = st.radio("Subjects", subjects, index=subjects.index(st.session_state.selected_subject) if st.session_state.selected_subject else 0)
+
+    if st.session_state.selected_subject != selected_subject:
+        st.session_state.selected_subject = selected_subject
+
+    st.write(f"Selected Subject: {st.session_state.selected_subject}")
+
+st.title("💬 My Chatbot for 9th Grade")
+st.caption("AI Chatbot powered by Me")
 
 # Initialize the session state to store messages
 if "messages" not in st.session_state:
@@ -43,7 +47,7 @@ for msg in st.session_state.messages:
 
 # Chat input and processing
 if prompt := st.chat_input():
-    if not selected_subject:
+    if not st.session_state.selected_subject:
         st.info("Please select a subject to continue.")
         st.stop()
 
@@ -51,7 +55,7 @@ if prompt := st.chat_input():
     st.chat_message("user").write(prompt)
 
     # Constructing a prompt that includes the selected subject
-    subject_prompt = f"The student is studying {selected_subject}. Please provide a helpful and detailed response."
+    subject_prompt = f"The student is studying {st.session_state.selected_subject}. Please provide a helpful and detailed response."
     full_prompt = f"{subject_prompt}\n\n{prompt}"
 
     response = openai.ChatCompletion.create(
