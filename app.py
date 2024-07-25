@@ -30,8 +30,8 @@ with st.sidebar:
             selected_subject = subject
             break
 
-st.title("💬 My Chatbot for 9th Grade")
-st.caption("🚀 A Streamlit chatbot powered by Me")
+st.title("Learn with Chatbot - 9th Grade Students")
+st.caption("Powered by ChatGpt")
 
 # Initialize the session state to store messages
 if "messages" not in st.session_state:
