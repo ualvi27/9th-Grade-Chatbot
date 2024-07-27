@@ -55,7 +55,7 @@ if prompt := st.chat_input():
     st.chat_message("user").write(prompt)
 
     # Constructing a prompt that includes the selected subject
-    subject_prompt = f"The student is studying {st.session_state.selected_subject}. Please provide a helpful and detailed response."
+    subject_prompt = f"The student is studying {st.session_state.selected_subject}. Please provide step by step detailed answer for a 9th grade student to understand easily."
     full_prompt = f"{subject_prompt}\n\n{prompt}"
 
     response = openai.ChatCompletion.create(
